@@ -5,6 +5,8 @@ CREATE TABLE cashflows (
     book_id UUID NOT NULL,
     description TEXT NOT NULL,
     type VARCHAR NOT NULL,
+    amount BIGINT NOT NULL,
+    balance BIGINT NOT NULL,
     related_cashflow_id UUID,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL

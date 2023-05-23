@@ -26,3 +26,9 @@ migrate-up:
 	
 migrate-down:
 	goose -dir ${GOOSE_MIGRATION_DIR} ${GOOSE_DRIVER} ${GOOSE_DBSTRING} down
+	
+migrate-reset:
+	goose -dir ${GOOSE_MIGRATION_DIR} ${GOOSE_DRIVER} ${GOOSE_DBSTRING} reset
+	
+migrate-redo:
+	goose -dir ${GOOSE_MIGRATION_DIR} ${GOOSE_DRIVER} ${GOOSE_DBSTRING} redo

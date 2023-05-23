@@ -5,6 +5,7 @@ CREATE TABLE books (
     user_id UUID NOT NULL,
     username VARCHAR NOT NULL,
     name VARCHAR NOT NULL,
+    balance BIGINT NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
