@@ -8,6 +8,7 @@ CREATE TABLE cashflows (
     amount BIGINT NOT NULL,
     balance BIGINT NOT NULL,
     related_cashflow_id UUID,
+    transaction_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
