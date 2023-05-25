@@ -19,29 +19,18 @@ func New(authUC auth.Usecase) *Handler {
 }
 
 func (h *Handler) Register(r *gin.Engine, m *middleware.Middleware) {
-	// userRoute := r.Group("/auth")
-	// {
-	// versionCheckGroup := userRoute.Group("")
-	// {
-	// 	versionCheckGroup.POST("/signin", m.VersionHandle(), h.SignInWithUsername)
-	// 	versionCheckGroup.POST("/signin/phone", m.VersionHandle(), h.SignInWithPhone)
-	// 	versionCheckGroup.POST("/signin/phone/validate", m.VersionHandle(), h.SignInWithPhoneValidate)
-	// 	versionCheckGroup.POST("/phone", m.VersionHandle(), h.SignUpWithPhone)
-	// 	versionCheckGroup.POST("/phone/validate", m.VersionHandle(), h.SignUpWithPhoneValidate)
-	// 	versionCheckGroup.POST("/signup", m.VersionHandle(), h.SignUp)
-	// 	versionCheckGroup.POST("/otp/phone", m.VersionHandle(), h.RequestPhoneOTP)
-	// 	versionCheckGroup.POST("/otp/phone/validate", m.VersionHandle(), h.ValidatePhoneOTP)
-	// }
-	// userRoute.POST("/forget-password", h.ForgetPassword)
-	// userRoute.GET("/reset-password/:token", h.ValidateResetPasswordToken)
-	// userRoute.POST("/reset-password", h.ResetPassword)
+	userRoute := r.Group("/auth")
+	{
+		userRoute.POST("/signup", h.SignUp)
+		userRoute.POST("/signin", h.SignIn)
 
-	// refresh jwt token
-	// userRoute.GET("/refresh", m.RefreshHandle())
-	// userRoute.GET("/temp-token", m.AuthHandle(), h.TempToken)
-	// userRoute.POST("/google-callback", h.GoogleCallback)
-	// userRoute.POST("/facebook-callback", h.FacebookCallback)
-	// }
+		// userRoute.POST("/forget-password", h.ForgetPassword)
+		// userRoute.GET("/reset-password/:token", h.ValidateResetPasswordToken)
+		// userRoute.POST("/reset-password", h.ResetPassword)
+
+		// refresh jwt token
+		// userRoute.GET("/refresh", m.RefreshHandle())
+	}
 
 	// adminRoute := r.Group("/admin/auth")
 	// {

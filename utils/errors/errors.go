@@ -8,37 +8,51 @@ import (
 )
 
 var (
+	// ErrTetapTenangTetapSemangat custom error on unexpected error
+	ErrTetapTenangTetapSemangat = CustomError{
+		Mask:     "Tetap Tenang Tetap Semangat",
+		Message:  "Tetap Tenang Tetap Semangat",
+		HTTPCode: http.StatusInternalServerError,
+	}
+
 	ErrBadRequest = CustomError{
+		Mask:     "Bad Request",
 		Message:  "Bad Request",
 		HTTPCode: http.StatusBadRequest,
 	}
 
 	ErrUnauthorized = CustomError{
+		Mask:     "Unauthorized",
 		Message:  "Unauthorized",
 		HTTPCode: http.StatusUnauthorized,
 	}
 
 	ErrForbidden = CustomError{
+		Mask:     "Forbidden",
 		Message:  "Forbidden",
 		HTTPCode: http.StatusForbidden,
 	}
 
 	ErrNotFound = CustomError{
+		Mask:     "Record not exist",
 		Message:  "Record not exist",
 		HTTPCode: http.StatusNotFound,
 	}
 
 	ErrUnprocessableEntity = CustomError{
+		Mask:     "Unprocessable Entity",
 		Message:  "Unprocessable Entity",
 		HTTPCode: http.StatusUnprocessableEntity,
 	}
 
 	ErrFailedAuthentication = CustomError{
+		Mask:     "Invalid Credentials",
 		Message:  "Invalid Credentials",
 		HTTPCode: http.StatusUnauthorized,
 	}
 
 	ErrInternalServerError = CustomError{
+		Mask:     "Internal Server Error",
 		Message:  "Internal Server Error",
 		HTTPCode: http.StatusInternalServerError,
 	}
@@ -46,15 +60,22 @@ var (
 
 // CustomError holds data for customized error
 type CustomError struct {
-	ErrWithStack error       `json: error`
+	ErrWithStack error       `json:"-"`
+	Mask         interface{} `json:"-"`
 	Message      interface{} `json:"message"`
 	HTTPCode     int         `json:"code"`
+	Report       bool        `json:"-"`
 }
 
 // Error is a function to convert error to string.
 // It exists to satisfy error interface
 func (c CustomError) Error() string {
 	return fmt.Sprint(c.Message)
+}
+
+// ErrorMask is a function to return error mask.
+func (c CustomError) ErrorMask() string {
+	return fmt.Sprint(c.Mask)
 }
 
 // New, Errorf, Wrap, and Wrapf record a stack trace at the point they are invoked.
@@ -69,33 +90,17 @@ func New(message string) error {
 	return errors.New(message)
 }
 
-// withStackCustom annotates custom err with a stack trace at the point WithStack was called.
-func withStackCustom(stackTraced error, err CustomError, message string) CustomError {
-	return CustomError{
-		ErrWithStack: stackTraced,
-		HTTPCode:     err.HTTPCode,
-		Message:      message,
+func CustomWrap(err error) error {
+	customErr, ok := err.(CustomError)
+	if ok && customErr.ErrWithStack == nil {
+		return CustomError{
+			ErrWithStack: Wrap(err, customErr.ErrorMask()),
+			HTTPCode:     customErr.HTTPCode,
+			Mask:         customErr.ErrorMask(),
+			Message:      customErr.Error(),
+		}
 	}
-}
-
-func CustomNew(customErr CustomError, message string) CustomError {
-	return withStackCustom(WithStack(customErr), customErr, message)
-}
-
-func CustomWrap(err error, customErr CustomError, message string) CustomError {
-	return withStackCustom(Wrap(err, customErr.Error()), customErr, message)
-}
-
-func CustomWithStack(customErr CustomError) CustomError {
-	return withStackCustom(WithStack(customErr), customErr, customErr.Error())
-}
-
-func CustomWithMessage(customErr CustomError, message string) CustomError {
-	newMessage := customErr.Error()
-	if message != "" {
-		newMessage = message
-	}
-	return withStackCustom(WithStack(customErr), customErr, newMessage)
+	return err
 }
 
 // Errorf formats according to a format specifier and returns the string

@@ -76,20 +76,20 @@ func (m *Middleware) ErrorHandle() gin.HandlerFunc {
 				switch e.Type {
 				case gin.ErrorTypePublic:
 					// Only output public errors if nothing has been written yet
-					// if !c.Writer.Written() {
-					// check if it is part of custom error
-					// if err, ok := e.Err.(errors.CustomError); ok {
-					// 	// report if stack traced
-					// 	if stackTracer, ok := err.ErrWithStack.(errors.StackTracer); ok {
-					// 		request_util.HandleExceptionLogging(c, err.HTTPCode, err.ErrWithStack, &stackTracer)
-					// 	}
+					if !c.Writer.Written() {
+						// check if it is part of custom error
+						if err, ok := e.Err.(errors.CustomError); ok {
+							// // report if stack traced
+							// if stackTracer, ok := err.ErrWithStack.(errors.StackTracer); ok {
+							// 	request_util.HandleExceptionLogging(c, err.HTTPCode, err.ErrWithStack, &stackTracer)
+							// }
 
-					// 	// print the underlying error and return the specified message to user
-					// 	c.JSON(err.HTTPCode, gin.H{"errors": err.Message})
-					// } else {
-					// 	c.JSON(c.Writer.Status(), gin.H{"errors": e.Error()})
-					// }
-					// }
+							// print the underlying error and return the specified message to user
+							c.JSON(err.HTTPCode, gin.H{"errors": err.Message})
+						} else {
+							c.JSON(c.Writer.Status(), gin.H{"errors": e.Error()})
+						}
+					}
 				case gin.ErrorTypeBind:
 					errs, ok := e.Err.(validator.ValidationErrors)
 					if ok {

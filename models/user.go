@@ -5,6 +5,7 @@ import "time"
 type User struct {
 	ID          string     `json:"id" groups:"user,admin"`
 	Username    string     `json:"username" groups:"user,admin"`
+	Password    string     `json:"-"`
 	Name        string     `json:"name" groups:"user,admin"`
 	Email       string     `json:"email" groups:"user,admin"`
 	LastLoginAt *time.Time `json:"last_login_at" groups:"admin"`

@@ -24,6 +24,9 @@ import (
 
 	authHTTP "exchequer/service/auth/delivery/http"
 	authModule "exchequer/service/auth/module"
+
+	userHTTP "exchequer/service/user/delivery/http"
+	userModule "exchequer/service/user/module"
 )
 
 type libs struct {
@@ -38,6 +41,7 @@ type handlers struct {
 
 	// OhlcHandler *exchequerHTTP.Handler
 	AuthHandler *authHTTP.Handler
+	UserHandler *userHTTP.Handler
 }
 
 func main() {
@@ -45,12 +49,27 @@ func main() {
 
 	loadEnv()
 
+	// set log to file
+	if os.Getenv("APP_ENV") != "development" {
+		log.Println("running in ", os.Getenv("APP_ENV"), " environment")
+		f, err := os.OpenFile("error-log.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//defer to close when you're done with it, not because you think it's idiomatic!
+		defer f.Close()
+
+		//set output of logs to f
+		log.SetOutput(f)
+	}
+
 	app := fx.New(
 		fx.Provide(
 			setupDatabase,
 			initLibs,
 		),
 		authModule.Module,
+		userModule.Module,
 		fx.Invoke(
 			validators.NewValidator,
 			startServer,
@@ -67,10 +86,11 @@ func startServer(lc fx.Lifecycle, db *gorm.DB, handlers handlers) {
 
 	h := server.BuildHandler(m,
 		handlers.AuthHandler,
+		handlers.UserHandler,
 	)
 
 	s := &http.Server{
-		Addr:         ":3030",
+		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
 		Handler:      h,
 		ReadTimeout:  300 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -112,9 +132,9 @@ func setupDatabase() *gorm.DB {
 		dsn := fmt.Sprintf(
 			"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 			os.Getenv("DATABASE_HOST"),
-			os.Getenv("DATABASE_USER"),
+			os.Getenv("DATABASE_USERNAME"),
 			os.Getenv("DATABASE_PASSWORD"),
-			os.Getenv("DATABASE_DBNAME"),
+			os.Getenv("DATABASE_NAME"),
 			os.Getenv("DATABASE_PORT"),
 		)
 
@@ -128,11 +148,11 @@ func setupDatabase() *gorm.DB {
 	} else if dbDriver == "mysql" {
 		dsn := fmt.Sprintf(
 			"%s:%s@(%s:%s)/%s?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true",
-			os.Getenv("DATABASE_USER"),
+			os.Getenv("DATABASE_USERNAME"),
 			os.Getenv("DATABASE_PASSWORD"),
 			os.Getenv("DATABASE_HOST"),
 			os.Getenv("DATABASE_PORT"),
-			os.Getenv("DATABASE_DBNAME"),
+			os.Getenv("DATABASE_NAME"),
 		)
 
 		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{

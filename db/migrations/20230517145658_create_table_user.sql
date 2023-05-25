@@ -3,6 +3,7 @@
 CREATE TABLE users (
     id UUID PRIMARY KEY,
     username VARCHAR NOT NULL,
+    password VARCHAR NOT NULL,
     name VARCHAR NOT NULL,
     email VARCHAR NOT NULL,
     last_login_at TIMESTAMP,
