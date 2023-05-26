@@ -27,6 +27,9 @@ import (
 
 	userHTTP "exchequer/service/user/delivery/http"
 	userModule "exchequer/service/user/module"
+
+	bookHTTP "exchequer/service/book/delivery/http"
+	bookModule "exchequer/service/book/module"
 )
 
 type libs struct {
@@ -42,6 +45,7 @@ type handlers struct {
 	// OhlcHandler *exchequerHTTP.Handler
 	AuthHandler *authHTTP.Handler
 	UserHandler *userHTTP.Handler
+	BookHandler *bookHTTP.Handler
 }
 
 func main() {
@@ -70,6 +74,7 @@ func main() {
 		),
 		authModule.Module,
 		userModule.Module,
+		bookModule.Module,
 		fx.Invoke(
 			validators.NewValidator,
 			startServer,
@@ -87,6 +92,7 @@ func startServer(lc fx.Lifecycle, db *gorm.DB, handlers handlers) {
 	h := server.BuildHandler(m,
 		handlers.AuthHandler,
 		handlers.UserHandler,
+		handlers.BookHandler,
 	)
 
 	s := &http.Server{

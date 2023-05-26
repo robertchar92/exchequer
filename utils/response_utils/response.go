@@ -7,19 +7,6 @@ type PaginationMeta struct {
 }
 
 type IndexResponse struct {
-	Status  string         `json:"status"`
-	Message string         `json:"message"`
-	Data    interface{}    `json:"data"`
-	Meta    PaginationMeta `json:"meta"`
-}
-
-type ShowResponse struct {
-	Status  string      `json:"status"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
-}
-
-type ErrorResponse struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
+	Data interface{}    `json:"data"`
+	Meta PaginationMeta `json:"meta"`
 }
